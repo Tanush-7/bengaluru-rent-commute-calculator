@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>Bengaluru Rent Commute Calculator — True cost of any flat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F5F1;--card:#FFFFFF;--card2:#EEF2EE;--ink:#13201B;--muted:#5B6B64;--line:#DDE3DE;--teal:#0E7569;--teal-dark:#0A5C54;--amber-bg:#FEF3C7;--red:#B91C1C;--green:#15803D;--radius:18px}
+@media (prefers-color-scheme: dark){:root{--bg:#0E1512;--card:#17211D;--card2:#1E2B26;--ink:#E8EFEA;--muted:#9AAEA4;--line:#2A3A33;--amber-bg:#2A2110}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 18px 44px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--teal)}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.05;margin:10px 0 10px;letter-spacing:-.03em;max-width:780px}h1 span{color:var(--teal)}
+.sub{font-size:17px;color:var(--muted);max-width:740px;margin:0}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 4px}.preset{border:1px solid var(--line);background:var(--card);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}.preset:hover{border-color:var(--teal);color:var(--teal)}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:18px;align-items:start}@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}.card h2{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}.card p.help{margin:0 0 8px;color:var(--muted);font-size:14px}
+label{font-size:13px;font-weight:700;display:block;margin:16px 0 7px}select,input[type=number]{width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;font-family:inherit}select:focus,input:focus{outline:2px solid var(--teal);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.seg{display:flex;gap:8px}.seg button{flex:1;padding:11px 8px;border-radius:12px;border:1px solid var(--line);background:var(--card2);font-weight:800;cursor:pointer;font-family:inherit}.seg button.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:520px){.modes{grid-template-columns:1fr}}
+.mode{border:1.5px solid var(--line);border-radius:14px;padding:12px;text-align:left;background:var(--card);cursor:pointer;font-family:inherit}.mode strong{display:block;font-size:14px}.mode span{font-size:12.5px;color:var(--muted);line-height:1.3;display:block;margin-top:2px}.mode.active{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 8%,var(--card))}
+.rangeRow{display:flex;align-items:center;gap:12px}input[type=range]{flex:1;accent-color:var(--teal)}
+.badge{font-family:"IBM Plex Mono",monospace;font-weight:600;background:var(--card2);border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:13px;white-space:nowrap}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;background:var(--card2);border-radius:12px;padding:12px}.check input{margin-top:3px;accent-color:var(--teal);width:18px;height:18px}.check span{font-size:13.5px}.check span b{display:block;font-size:14px}
+.note{font-size:12.5px;color:var(--muted);margin-top:7px;line-height:1.45}.note b{color:var(--ink)}
+.panel{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px;background:var(--card2)}.panel h3{margin:0 0 4px;font-size:14px}.panel p{margin:0;font-size:13px;color:var(--muted)}
+.verdict{position:sticky;top:14px}@media(max-width:860px){.verdict{position:static}}
+.verdictTop{background:var(--teal);color:#fff;border-radius:18px;padding:22px}.verdictTop small{letter-spacing:.1em;text-transform:uppercase;font-weight:800;font-size:11px;opacity:.9}
+.big{font-family:"IBM Plex Mono",monospace;font-size:clamp(36px,6vw,52px);line-height:1;font-weight:600;letter-spacing:-.04em;margin:8px 0 4px}.bigSub{opacity:.92;font-size:14px}
+.bar{height:14px;border-radius:999px;overflow:hidden;display:flex;background:var(--card2);margin:14px 0 8px}.bar i{display:block;height:100%}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:13px}.legend div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding:6px 0}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.kpi{background:var(--card2);border-radius:14px;padding:13px}.kpi b{font-family:"IBM Plex Mono",monospace;font-size:18px;display:block;line-height:1.1}.kpi span{font-size:12.5px;color:var(--muted)}
+.insight{margin-top:14px;border-radius:14px;padding:14px;font-size:14px}.insight.warn{background:var(--amber-bg);border:1px solid #F59E0B55}.insight.good{background:#DCFCE755;border:1px solid #22C55E55}
+.basis{margin-top:12px;font-size:13px;background:var(--card2);border-radius:12px;padding:12px;line-height:1.55}
+.tmodes{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:10px}.tmodes th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--line)}.tmodes td{padding:8px;border-bottom:1px solid var(--line)}.tmodes tr.sel td{background:color-mix(in srgb,var(--teal) 9%,transparent);font-weight:700}
+.section{margin-top:22px}.section h2{font-size:22px;letter-spacing:-.02em;margin:0 0 6px}.section>p{color:var(--muted);margin:0 0 14px;max-width:780px}
+.compare{display:flex;flex-direction:column;gap:10px}.crow{display:grid;grid-template-columns:1.35fr .75fr .7fr .8fr .7fr;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}@media(max-width:700px){.crow{grid-template-columns:1fr 1fr}.crow .hideM{display:none}}.crow.current{border-color:var(--teal);border-width:1.5px}.crow .mono{font-family:"IBM Plex Mono",monospace;font-weight:600}.crow small{display:block;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.save{color:var(--green);font-weight:800}.extra{color:var(--red);font-weight:800}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:800px){.how{grid-template-columns:1fr}}.how div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}.how h3{margin:0 0 6px;font-size:15px}.how p{margin:0;font-size:14px;color:var(--muted)}
+.foot{margin-top:26px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700}
+.tagGuide{color:var(--teal);font-weight:800}.tagEst{color:#B45309;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Bengaluru • Rent + Commute</div>
+  <h1>The rent looks cheap. <span>The commute decides.</span></h1>
+  <p class="sub">Pick a flat area and your office. This shows the true monthly cost — rent, maintenance, water, power, gas, internet, commute cash, and hours lost in traffic.</p>
+  <p style="margin:10px 0 0"><span class="pill">All figures are editable estimates — not live quotes</span> <span class="pill">Entries stay in this browser tab — nothing is uploaded</span></p>
+  <div class="presets">
+    <button class="preset" data-preset="hsr-bellandur">HSR → Bellandur ORR</button>
+    <button class="preset" data-preset="yel-whitefield">Yelahanka → Whitefield · Cab trap</button>
+    <button class="preset" data-preset="whitefield-whitefield">Live in Whitefield → Work in Whitefield</button>
+    <button class="preset" data-preset="ecity-bellandur">Electronic City → Bellandur</button>
+  </div>
+</header>
+
+<div class="grid">
+<section class="card" aria-label="Your flat and office">
+  <h2>Your flat &amp; office</h2>
+  <p class="help">Every rent in the area list shows its default for the selected BHK, and whether it is a guide rate or an estimate. Edit any field to match your actual listing and bills.</p>
+
+  <label>Home size</label>
+  <div class="seg" id="bhkSeg"><button data-bhk="1">1 BHK</button><button data-bhk="2" class="active">2 BHK</button><button data-bhk="3">3 BHK</button></div>
+
+  <label for="area">I live / want to live in — default rent shown</label>
+  <select id="area"></select>
+  <div class="note" id="areaRentNote"></div>
+
+  <div class="row2">
+    <div><label for="rent">Monthly rent (₹) — editable</label><input type="number" id="rent" value="32000" min="0" step="500"></div>
+    <div><label for="office">Office / work hub</label><select id="office"></select></div>
+  </div>
+
+  <div class="panel" style="background:var(--card)">
+    <h3>Household bills — separate, not lumped into “other”</h3>
+    <p>Tanker-dependent areas (Whitefield, Bellandur, Sarjapur Road, Marathahalli) default higher for water. Replace with your society’s actual charges.</p>
+    <div class="row2">
+      <div><label for="maint">Maintenance (₹/mo)</label><input type="number" id="maint" value="3500" min="0" step="100"></div>
+      <div><label for="water">Water / tanker (₹/mo)</label><input type="number" id="water" value="700" min="0" step="100"></div>
+    </div>
+    <div class="row2">
+      <div><label for="elec">Electricity — BESCOM (₹/mo)</label><input type="number" id="elec" value="1400" min="0" step="100"></div>
+      <div><label for="gas">Gas — LPG / piped (₹/mo)</label><input type="number" id="gas" value="950" min="0" step="50"></div>
+    </div>
+    <div><label for="internet">Internet / broadband (₹/mo)</label><input type="number" id="internet" value="999" min="0" step="50"></div>
+    <div class="note">Household total (ex-rent): <b id="billsTotal">—</b> · Included in the true cost and in every area comparison (using that area’s defaults).</div>
+  </div>
+
+  <div class="row2">
+    <div><label for="depositMonths">Deposit (months of rent)</label>
+      <select id="depositMonths"><option value="3">3 months</option><option value="5" selected>5 months — common now</option><option value="6">6 months</option><option value="10">10 months — flag this</option></select></div>
+    <div><label>Days in office / week: <span id="daysLabel">3 days</span></label>
+      <div class="rangeRow"><input type="range" id="days" min="1" max="6" value="3" step="1"><span class="badge" id="tripsBadge">—</span></div></div>
+  </div>
+
+  <label>How do you travel?</label>
+  <div class="modes" id="modes"></div>
+
+  <!-- METRO PICKER -->
+  <div class="panel" id="metroPanel">
+    <h3>🚇 Namma Metro — station-to-station fare picker</h3>
+    <p>Pick your boarding and alighting stations. Fare, rail distance and time update from the station gap — no manual fare entry needed. Auto-set from your area + office; change it if you board elsewhere. Interchange via Majestic is handled.</p>
+    <div class="row2">
+      <div><label for="metroFrom">Board at</label><select id="metroFrom"></select></div>
+      <div><label for="metroTo">Get down at</label><select id="metroTo"></select></div>
+    </div>
+    <div class="note" id="metroFareNote"></div>
+    <div><label for="metroFareEdit">Metro fare per one-way trip (₹) — editable estimate</label><input type="number" id="metroFareEdit" value="40" min="0" step="5"></div>
+  </div>
+
+  <!-- BUS BASIS -->
+  <div class="panel" id="busPanel">
+    <h3>🚌 BMTC bus — what is the figure based on?</h3>
+    <p>Choose the basis, then edit the amount. A monthly pass is flat no matter how many days you travel; per-trip adds up per office day. The verdict shows which basis is in use.</p>
+    <label for="busBasis">Bus cost basis</label>
+    <select id="busBasis">
+      <option value="pass-ac">Monthly pass — AC / Vajra (flat per month)</option>
+      <option value="pass-ordinary">Monthly pass — Ordinary / non-AC (flat per month)</option>
+      <option value="pertrip-ac" selected>Per-trip fare — AC (per one-way trip)</option>
+      <option value="pertrip-nonac">Per-trip fare — Non-AC (per one-way trip)</option>
+    </select>
+    <label for="busAmount" id="busAmountLabel">Amount (₹ per one-way trip)</label>
+    <input type="number" id="busAmount" value="25" min="0" step="1">
+    <div class="note" id="busNote"></div>
+  </div>
+
+  <div class="check"><input type="checkbox" id="lastMile" checked><span><b>Add last-mile auto</b> For Metro / Bus: short auto at one end when the station or stop is not walkable (₹45 Metro / ₹30 Bus per one-way trip, editable in the calculation note). Turn off if you walk.</span></div>
+
+  <div class="check"><input type="checkbox" id="countTime"><span><b>Count my time as money</b> Uses the hourly value below.</span></div>
+  <div class="row2" id="timeRow" style="display:none">
+    <div><label for="hourly">Your time value (₹ / hour)</label><input type="number" id="hourly" value="400" min="50" step="50"></div>
+    <div><label>Quick set from take-home</label><select id="salaryPreset"><option value="">Choose take-home / month</option><option value="80000">₹80k/mo → ~₹500/hr</option><option value="120000">₹1.2L/mo → ~₹750/hr</option><option value="180000">₹1.8L/mo → ~₹1,125/hr</option><option value="250000">₹2.5L/mo → ~₹1,560/hr</option></select></div>
+  </div>
+</section>
+
+<aside class="card verdict" aria-label="True cost result">
+  <div class="verdictTop"><small>True monthly cost — estimate</small><div class="big" id="trueCost">₹0</div><div class="bigSub" id="verdictLine">—</div></div>
+  <div style="padding-top:16px">
+    <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700"><span>Where the money goes</span><span id="yearCost"></span></div>
+    <div class="bar"><i style="background:#0E7569" id="barRent"></i><i style="background:#7C3AED" id="barBills"></i><i style="background:#38BDF8" id="barCommute"></i><i style="background:#F59E0B" id="barTime"></i></div>
+    <div class="legend">
+      <div><span><i class="dot" style="background:#0E7569"></i>Rent</span><b id="legRent">—</b></div>
+      <div><span><i class="dot" style="background:#7C3AED"></i>Bills (maint.+utilities)</span><b id="legBills">—</b></div>
+      <div><span><i class="dot" style="background:#38BDF8"></i>Commute cash</span><b id="legCommute">—</b></div>
+      <div><span><i class="dot" style="background:#F59E0B"></i>Time cost</span><b id="legTime">—</b></div>
+      <div><span>Deposit upfront</span><b id="legDeposit">—</b></div>
+      <div><span>Water + power + gas + net</span><b id="legUtils">—</b></div>
+    </div>
+    <div class="basis" id="fareBasis">—</div>
+    <div class="kpis">
+      <div class="kpi"><b id="kDist">—</b><span>one-way distance (road / rail as applicable)</span></div>
+      <div class="kpi"><b id="kTimeOne">—</b><span>one-way in peak traffic</span></div>
+      <div class="kpi"><b id="kHours">—</b><span>hours in commute / month</span></div>
+      <div class="kpi"><b id="kPerTrip">—</b><span>cost per office day (return)</span></div>
+    </div>
+    <div class="insight warn" id="insight">—</div>
+
+    <h3 style="margin:18px 0 0;font-size:15px">Commute time &amp; cost by mode — same route, peak hours</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:4px 0 0"><b>Peak-traffic note:</b> 8:30–10:30 am &amp; 5:30–8:00 pm. Road times below are peak estimates — ORR, Silk Board, Hebbal and Marathahalli bridge can add another 30–50% on a bad day. Metro time does not change in peak. Off-peak road time is roughly 35% less.</p>
+    <div style="overflow-x:auto"><table class="tmodes"><thead><tr><th>Mode</th><th>One-way (peak)</th><th>Hrs / mo</th><th>Cash / mo</th></tr></thead><tbody id="timeTable"></tbody></table></div>
+    <p style="font-size:12.5px;color:var(--muted);margin:12px 0 0">Deposit is blocked money, not monthly spend. Painting / move-in charges in most Bengaluru agreements: budget ₹8k–₹20k one-time extra.</p>
+  </div>
+</aside>
+</div>
+
+<section class="section">
+  <h2>Same office, same travel mode — where is it actually cheaper?</h2>
+  <p>Ranked by true monthly cost for the same BHK and office days, including each area’s own bills defaults. For Metro, each area uses its nearest station fare to your office station — no manual fare entry. For Bus, your chosen pass / per-trip basis applies to every area. Your current pick is highlighted.</p>
+  <div class="compare" id="compare"></div>
+</section>
+
+<section class="section"><h2>How this is calculated</h2>
+<div class="how">
+  <div><h3>Rents: guide vs estimate</h3><p><span class="tagGuide">Guide rate</span> = areas with dense Nov 2026 listings — median asking rent for a semi-furnished flat, usable as a negotiation anchor (±10%). <span class="tagEst">Estimate</span> = fewer listings, wider spread — treat as ±20% and replace with your listing. Gated premium societies run 15–30% higher.</p></div>
+  <div><h3>Metro &amp; Bus basis</h3><p>Metro fare uses BMRCL distance slabs on the station-to-station rail gap (₹10 up to 2 km, rising to ₹90 max), plus last-mile if ticked. BMTC: either a flat monthly pass (amount you set) or per-trip fare × office days — the basis in use is always printed in the verdict, never an unexplained number.</p></div>
+  <div><h3>Time &amp; other modes</h3><p>Peak speeds: Bike ~22 km/h, Auto ~18, Car/Cab ~16, Bus ~14, Metro ~32 plus access. Auto ₹30+₹15/km, Cab ₹70+₹18/km, Own car ~₹12/km, Own bike ~₹5/km, Shuttle ₹2,500/mo pass estimate. All editable in code-level assumptions — treat outputs as estimates, not quotes.</p></div>
+</div></section>
+
+<p class="foot">Built for Bengaluru house-hunting. Not a listing site and not a live fare quote — BMRCL / BMTC fares and rents change, so confirm the fare in the Namma Metro / BMTC app and the rent, deposit, water source (Cauvery / borewell / tanker) and painting charges in the agreement before paying token money. <span class="pill">Idea #1 — Bengaluru problems list</span> <span class="pill">Companion: Wedding Budget Planner</span></p>
+</div>
+
+<script>
+// ---------- DATA ----------
+const AREAS=[
+{id:'indiranagar',name:'Indiranagar',lat:12.9784,lng:77.6408,rents:{1:22000,2:38000,3:58000},maint:4000,rentType:'guide',metro:'indiranagar',tanker:false},
+{id:'koramangala',name:'Koramangala',lat:12.9352,lng:77.6245,rents:{1:20000,2:35000,3:52000},maint:3800,rentType:'guide',metro:'mgroad',tanker:false},
+{id:'hsr',name:'HSR Layout',lat:12.9116,lng:77.6389,rents:{1:18000,2:32000,3:48000},maint:3500,rentType:'guide',metro:'jayanagar',tanker:false},
+{id:'whitefield',name:'Whitefield',lat:12.9698,lng:77.7500,rents:{1:16000,2:28000,3:42000},maint:4500,rentType:'guide',metro:'whitefield',tanker:true},
+{id:'bellandur',name:'Bellandur',lat:12.9257,lng:77.6810,rents:{1:17000,2:30000,3:45000},maint:4200,rentType:'guide',metro:'krpuram',tanker:true},
+{id:'marathahalli',name:'Marathahalli',lat:12.9569,lng:77.7011,rents:{1:15000,2:26000,3:38000},maint:3200,rentType:'estimate',metro:'hoodi',tanker:true},
+{id:'jpnagar',name:'JP Nagar',lat:12.9063,lng:77.5857,rents:{1:15000,2:26000,3:40000},maint:3000,rentType:'estimate',metro:'jpnagar-stn',tanker:false},
+{id:'btm',name:'BTM Layout',lat:12.9166,lng:77.6101,rents:{1:14000,2:24000,3:36000},maint:2800,rentType:'estimate',metro:'jayanagar',tanker:false},
+{id:'hebbal',name:'Hebbal',lat:13.0451,lng:77.5926,rents:{1:16000,2:28000,3:43000},maint:3600,rentType:'guide',metro:'yeshwanthpur',tanker:false},
+{id:'yelahanka',name:'Yelahanka',lat:13.1007,lng:77.5963,rents:{1:11000,2:19000,3:28000},maint:2400,rentType:'estimate',metro:'peenya',tanker:false},
+{id:'sarjapur',name:'Sarjapur Road',lat:12.9100,lng:77.6800,rents:{1:16000,2:29000,3:44000},maint:4000,rentType:'estimate',metro:'hoodi',tanker:true},
+{id:'electroniccity',name:'Electronic City',lat:12.8399,lng:77.6770,rents:{1:12000,2:21000,3:32000},maint:3000,rentType:'estimate',metro:'silkinstitute',tanker:false},
+{id:'malleshwaram',name:'Malleshwaram',lat:13.0035,lng:77.5648,rents:{1:17000,2:30000,3:46000},maint:3200,rentType:'guide',metro:'sampige',tanker:false},
+{id:'banashankari',name:'Banashankari',lat:12.9155,lng:77.5736,rents:{1:13000,2:23000,3:35000},maint:2600,rentType:'estimate',metro:'banashankari-stn',tanker:false},
+{id:'krpuram',name:'KR Puram',lat:12.9950,lng:77.6780,rents:{1:13000,2:22000,3:34000},maint:2800,rentType:'estimate',metro:'krpuram',tanker:false},
+{id:'rrnagar',name:'RR Nagar',lat:12.9230,lng:77.5190,rents:{1:12000,2:21000,3:32000},maint:2500,rentType:'estimate',metro:'rrnagar-stn',tanker:false},
+];
+const OFFICES=[
+{id:'whitefield',name:'Whitefield — ITPL / EPIP',lat:12.9850,lng:77.7370,metro:'pattandur'},
+{id:'bellandur',name:'Bellandur — Outer Ring Road (ORR)',lat:12.9257,lng:77.6810,metro:'krpuram'},
+{id:'koramangala',name:'Koramangala / Inner Ring Road',lat:12.9352,lng:77.6245,metro:'mgroad'},
+{id:'mgroad',name:'MG Road / CBD',lat:12.9750,lng:77.6060,metro:'mgroad'},
+{id:'manyata',name:'Hebbal — Manyata Tech Park',lat:13.0560,lng:77.5920,metro:'yeshwanthpur'},
+{id:'electroniccity',name:'Electronic City',lat:12.8399,lng:77.6770,metro:'silkinstitute'},
+{id:'sarjapur',name:'Sarjapur / Wipro / RGA',lat:12.8850,lng:77.7000,metro:'hoodi'},
+{id:'indiranagar',name:'Indiranagar / Domlur / EGL',lat:12.9620,lng:77.6380,metro:'indiranagar'},
+];
+// Namma Metro stations: km = approx distance along line from terminus. Majestic is the interchange.
+const STATIONS=[
+ // Purple Line — from Whitefield (Kadugodi)
+ {id:'whitefield',name:'Whitefield (Kadugodi)',line:'Purple',km:0},{id:'hopefarm',name:'Hope Farm Channasandra',line:'Purple',km:1.9},{id:'pattandur',name:'Pattandur Agrahara (ITPL)',line:'Purple',km:3.5},{id:'sathyasai',name:'Sri Sathya Sai Hospital',line:'Purple',km:4.6},{id:'nallurahalli',name:'Nallurahalli',line:'Purple',km:5.8},{id:'kundalahalli',name:'Kundalahalli',line:'Purple',km:7.2},{id:'seetharamapalya',name:'Seetharamapalya',line:'Purple',km:8.4},{id:'hoodi',name:'Hoodi',line:'Purple',km:9.5},{id:'garudacharpalya',name:'Garudacharapalya',line:'Purple',km:10.8},{id:'singayyanapalya',name:'Singayyanapalya',line:'Purple',km:12.2},{id:'krpuram',name:'Krishnarajapura (KR Puram)',line:'Purple',km:13.5},{id:'baiyappanahalli',name:'Baiyappanahalli',line:'Purple',km:16.5},{id:'svroad',name:'Swami Vivekananda Road',line:'Purple',km:17.8},{id:'indiranagar',name:'Indiranagar',line:'Purple',km:18.9},{id:'halasuru',name:'Halasuru',line:'Purple',km:20.1},{id:'trinity',name:'Trinity',line:'Purple',km:21.2},{id:'mgroad',name:'MG Road',line:'Purple',km:22.2},{id:'cubbon',name:'Cubbon Park',line:'Purple',km:23.1},{id:'vidhana',name:'Dr. B.R. Ambedkar Stn, Vidhana Soudha',line:'Purple',km:23.9},{id:'visvesvaraya',name:'Sir M. Visvesvaraya Stn, Central College',line:'Purple',km:24.8},{id:'majestic-p',name:'Nadaprabhu Kempegowda Stn, Majestic',line:'Purple',km:25.7},{id:'cityrail',name:'City Railway Station',line:'Purple',km:26.6},{id:'magadi',name:'Magadi Road',line:'Purple',km:27.9},{id:'hosahalli',name:'Hosahalli',line:'Purple',km:29.3},{id:'vijayanagar',name:'Vijayanagar',line:'Purple',km:30.4},{id:'attiguppe',name:'Attiguppe',line:'Purple',km:31.6},{id:'deepanjali',name:'Deepanjali Nagar',line:'Purple',km:32.9},{id:'mysururoad',name:'Mysuru Road',line:'Purple',km:34.3},{id:'nayandahalli',name:'Nayandahalli',line:'Purple',km:35.7},{id:'rrnagar-stn',name:'Rajarajeshwari Nagar',line:'Purple',km:37.1},{id:'jnanabharathi',name:'Jnanabharathi',line:'Purple',km:38.7},{id:'pattanagere',name:'Pattanagere',line:'Purple',km:40.2},{id:'kengeri-bus',name:'Kengeri Bus Terminal',line:'Purple',km:41.6},{id:'kengeri',name:'Kengeri',line:'Purple',km:42.6},{id:'challaghatta',name:'Challaghatta',line:'Purple',km:44.0},
+ // Green Line — from Madavara
+ {id:'madavara',name:'Madavara',line:'Green',km:0},{id:'chikkabanavara',name:'Chikkabanavara',line:'Green',km:2.2},{id:'manjunath',name:'Manjunath Nagar',line:'Green',km:3.6},{id:'dasarahalli',name:'Dasarahalli',line:'Green',km:5.5},{id:'jalahalli',name:'Jalahalli',line:'Green',km:6.8},{id:'peenya-ind',name:'Peenya Industry',line:'Green',km:8.0},{id:'peenya',name:'Peenya',line:'Green',km:9.0},{id:'goraguntepalya',name:'Goraguntepalya',line:'Green',km:10.2},{id:'yeshwanthpur',name:'Yeshwanthpur',line:'Green',km:11.4},{id:'sandal',name:'Sandal Soap Factory',line:'Green',km:12.7},{id:'mahalakshmi',name:'Mahalakshmi',line:'Green',km:13.8},{id:'rajajinagar',name:'Rajajinagar',line:'Green',km:15.0},{id:'kuvempu',name:'Kuvempu Road',line:'Green',km:16.1},{id:'srirampura',name:'Srirampura',line:'Green',km:17.2},{id:'sampige',name:'Sampige Road',line:'Green',km:18.3},{id:'majestic-g',name:'Nadaprabhu Kempegowda Stn, Majestic',line:'Green',km:19.4},{id:'chickpete',name:'Chickpete',line:'Green',km:20.3},{id:'krmarket',name:'Krishna Rajendra Market',line:'Green',km:21.2},{id:'national',name:'National College',line:'Green',km:22.4},{id:'lalbagh',name:'Lalbagh',line:'Green',km:23.5},{id:'southend',name:'South End Circle',line:'Green',km:24.5},{id:'jayanagar',name:'Jayanagar',line:'Green',km:25.6},{id:'rvroad',name:'Rashtreeya Vidyalaya Road',line:'Green',km:26.9},{id:'banashankari-stn',name:'Banashankari',line:'Green',km:28.1},{id:'jpnagar-stn',name:'Jaya Prakash Nagar (JP Nagar)',line:'Green',km:29.3},{id:'yelachenahalli',name:'Yelachenahalli',line:'Green',km:30.7},{id:'konanakunte',name:'Konanakunte Cross',line:'Green',km:32.0},{id:'doddakallasandra',name:'Doddakallasandra',line:'Green',km:33.2},{id:'vajarahalli',name:'Vajarahalli',line:'Green',km:34.4},{id:'thalaghattapura',name:'Thalaghattapura',line:'Green',km:35.7},{id:'silkinstitute',name:'Silk Institute',line:'Green',km:37.0},
+];
+const MODES=[
+{id:'metro',name:'Namma Metro',desc:'Fare from station picker below. Time steady even in peak.',speed:32,accessMin:12},
+{id:'bus',name:'BMTC Bus',desc:'Pass or per-trip — choose the basis below. Slowest in peak.',speed:14,accessMin:8},
+{id:'bike',name:'Own Bike / Scooter',desc:'Fuel + wear ~₹5/km. Fastest door-to-door under 10 km.',speed:22,accessMin:3},
+{id:'car',name:'Own Car',desc:'Fuel + wear ~₹12/km. Parking extra if office charges.',speed:16,accessMin:5},
+{id:'auto',name:'Auto',desc:'₹30 + ₹15/km. Good under 7 km.',speed:18,accessMin:4},
+{id:'cab',name:'Cab (Ola / Uber)',desc:'₹70 + ₹18/km. Surge extra in peak / rain.',speed:16,accessMin:6},
+{id:'shuttle',name:'Company Shuttle',desc:'₹2,500/mo pass estimate if charged.',speed:18,accessMin:10},
+];
+let state={bhk:2,mode:'metro',metroManualFare:false};
+const $=id=>document.getElementById(id);
+const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+function hav(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+function roadKm(area,office){return Math.max(1,Math.round(hav(area,office)*1.35*10)/10)}
+function stationById(id){return STATIONS.find(s=>s.id===id)}
+function railKm(fromId,toId){
+  const a=stationById(fromId),b=stationById(toId); if(!a||!b) return 0;
+  if(a.line===b.line) return Math.round(Math.abs(a.km-b.km)*10)/10;
+  const majA=stationById(a.line==='Purple'?'majestic-p':'majestic-g'), majB=stationById(b.line==='Purple'?'majestic-p':'majestic-g');
+  return Math.round((Math.abs(a.km-majA.km)+Math.abs(b.km-majB.km))*10)/10;
+}
+function slabFare(km){if(km<=0)return 10;if(km<=2)return 10;if(km<=4)return 20;if(km<=6)return 30;if(km<=8)return 40;if(km<=10)return 50;if(km<=12)return 60;if(km<=16)return 70;if(km<=20)return 80;return 90}
+function defaultUtils(area,bhk){
+  const water=area.tanker?1800:650;
+  const elec=bhk===1?900:bhk===2?1400:2000;
+  return {water,elec,gas:950,internet:999,bills:area.maint+water+elec+950+999};
+}
+function busBasisInfo(){
+  const basis=$('busBasis').value, amt=+$('busAmount').value||0;
+  const isPass=basis.startsWith('pass');
+  return {basis,amt,isPass,label: isPass?`BMTC monthly pass (${basis==='pass-ac'?'AC / Vajra':'Ordinary'}) — ${fmt(amt)}/mo flat`:`BMTC per-trip fare (${basis==='pertrip-ac'?'AC':'Non-AC'}) — ${fmt(amt)} per one-way trip`};
+}
+function commuteFor(mode,area,office,roundTrips,opts){
+  opts=opts||{}; const km=roadKm(area,office); const lastMile=$('lastMile').checked;
+  let cash=0,perDay=0,mins=0,basis='',distLabel=km+' km road';
+  if(mode==='metro'){
+    const from=opts.metroFrom||area.metro, to=opts.metroTo||office.metro;
+    const rk=railKm(from,to); const fare=(opts.metroFare!=null?opts.metroFare:slabFare(rk));
+    const one=fare+(lastMile?45:0); perDay=one*2; cash=perDay*roundTrips;
+    mins=Math.max(10,Math.round(rk/32*60)+12); distLabel=rk+' km by Metro ('+km+' km road)';
+    basis=`Metro: ${stationById(from)?.name||from} → ${stationById(to)?.name||to} · ${rk} km · ${fmt(fare)} one-way slab fare${lastMile?' + ₹45 last-mile auto per one-way trip':''} × ${roundTrips} office days × 2 ways = ${fmt(cash)}/mo. Estimate — confirm in Namma Metro app.`;
+  } else if(mode==='bus'){
+    const bi=busBasisInfo(); const lm=lastMile?30:0;
+    if(bi.isPass){ cash=bi.amt + (lm*2*roundTrips); perDay=roundTrips?Math.round(cash/roundTrips):cash; basis=`Bus basis: ${bi.label} — flat, does not rise with office days${lastMile?` + last-mile auto ₹30 × 2 × ${roundTrips} days = ${fmt(lm*2*roundTrips)}`:''}. Total ${fmt(cash)}/mo.`; }
+    else { const one=bi.amt+lm; perDay=one*2; cash=perDay*roundTrips; basis=`Bus basis: ${bi.label} — ${fmt(bi.amt)}${lastMile?' + ₹30 last-mile':''} per one-way × 2 × ${roundTrips} office days = ${fmt(cash)}/mo. If you travel 4+ days/week, compare the monthly pass above — it is usually cheaper.`; }
+    mins=Math.round(km/14*60)+8;
+  } else if(mode==='auto'){const one=30+15*km;perDay=one*2;cash=perDay*roundTrips;mins=Math.round(km/18*60)+4;basis=`Auto: (₹30 + ₹15 × ${km} km) × 2 × ${roundTrips} days = ${fmt(cash)}/mo.`}
+  else if(mode==='cab'){const one=70+18*km;perDay=one*2;cash=perDay*roundTrips;mins=Math.round(km/16*60)+6;basis=`Cab: (₹70 + ₹18 × ${km} km) × 2 × ${roundTrips} days = ${fmt(cash)}/mo, before surge.`}
+  else if(mode==='car'){const one=12*km;perDay=one*2;cash=perDay*roundTrips;mins=Math.round(km/16*60)+5;basis=`Own car: ₹12/km (fuel + wear) × ${km} km × 2 × ${roundTrips} days = ${fmt(cash)}/mo. Office parking extra if charged.`}
+  else if(mode==='bike'){const one=5*km;perDay=one*2;cash=perDay*roundTrips;mins=Math.round(km/22*60)+3;basis=`Own bike: ₹5/km × ${km} km × 2 × ${roundTrips} days = ${fmt(cash)}/mo.`}
+  else if(mode==='shuttle'){cash=2500;perDay=roundTrips?Math.round(cash/roundTrips):cash;mins=Math.round(km/18*60)+10;basis=`Shuttle: ${fmt(2500)}/mo pass estimate (many companies charge ₹0 — set your true cost by editing the mode assumption in How this is calculated).`}
+  return {cash,perDay,mins,km,basis,distLabel,hours:(mins*2*roundTrips)/60};
+}
+function renderAreaOptions(){
+  const cur=$('area').value;
+  $('area').innerHTML=AREAS.map(a=>`<option value="${a.id}">${a.name} — ${state.bhk}BHK ${a.rentType==='guide'?'guide':'estimate'} ${fmt(a.rents[state.bhk])}/mo</option>`).join('');
+  if(cur) $('area').value=cur;
+}
+function fillStations(){
+  const groups=['Purple','Green'].map(line=>`<optgroup label="${line} Line">${STATIONS.filter(s=>s.line===line).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</optgroup>`).join('');
+  $('metroFrom').innerHTML=groups; $('metroTo').innerHTML=groups;
+}
+function syncMetroStations(){
+  const a=AREAS.find(x=>x.id===$('area').value), o=OFFICES.find(x=>x.id===$('office').value);
+  if(a) $('metroFrom').value=a.metro; if(o) $('metroTo').value=o.metro;
+  state.metroManualFare=false; updateMetroFare(false);
+}
+function updateMetroFare(recalc=true){
+  const rk=railKm($('metroFrom').value,$('metroTo').value); const fare=slabFare(rk);
+  if(!state.metroManualFare) $('metroFareEdit').value=fare;
+  $('metroFareNote').innerHTML=`<b>${stationById($('metroFrom').value)?.name}</b> → <b>${stationById($('metroTo').value)?.name}</b> · Rail distance <b>${rk} km</b> · Slab fare <b>${fmt(fare)}</b> one-way (BMRCL distance slabs, max ₹90). If your stations differ from your area’s nearest, the area comparison still uses each area’s nearest station.`;
+  if(recalc) calc();
+}
+function syncFromArea(){
+  const a=AREAS.find(x=>x.id===$('area').value); if(!a) return;
+  $('rent').value=a.rents[state.bhk]; $('maint').value=a.maint;
+  const u=defaultUtils(a,state.bhk); $('water').value=u.water; $('elec').value=u.elec; $('gas').value=u.gas; $('internet').value=u.internet;
+  $('areaRentNote').innerHTML= a.rentType==='guide'
+    ? `<span class="tagGuide">● Guide rate</span> — <b>${fmt(a.rents[state.bhk])}/mo</b> for ${state.bhk}BHK is the Nov 2026 median asking rent here (semi-furnished). Negotiation anchor, ±10%. ${a.tanker?'<b>Water:</b> tanker-dependent area — water default set higher.':''}`
+    : `<span class="tagEst">● Estimate</span> — <b>${fmt(a.rents[state.bhk])}/mo</b> for ${state.bhk}BHK is an estimate from fewer listings here, ±20%. Replace it with your actual listing before deciding. ${a.tanker?'<b>Water:</b> tanker-dependent area — water default set higher.':''}`;
+  syncMetroStations();
+}
+function currentBills(){return (+$('maint').value||0)+(+$('water').value||0)+(+$('elec').value||0)+(+$('gas').value||0)+(+$('internet').value||0)}
+function calc(){
+  const area=AREAS.find(x=>x.id===$('area').value), office=OFFICES.find(x=>x.id===$('office').value);
+  const days=+$('days').value; const roundTrips=Math.round(days*4.33);
+  $('daysLabel').textContent=days+(days===1?' day':' days'); $('tripsBadge').textContent=roundTrips+' office days/mo';
+  $('billsTotal').textContent=fmt(currentBills());
+  const rent=+$('rent').value||0, bills=currentBills();
+  const metroFare=+$('metroFareEdit').value||0;
+  const c=commuteFor(state.mode,area,office,roundTrips,{metroFrom:$('metroFrom').value,metroTo:$('metroTo').value,metroFare: state.mode==='metro'?metroFare:null});
+  const countTime=$('countTime').checked; const timeCost=countTime? c.hours*(+$('hourly').value||0):0;
+  const total=rent+bills+c.cash+timeCost;
+  $('trueCost').textContent=fmt(total);
+  $('verdictLine').textContent=`${area.name} → ${office.name.split('—')[0].trim()} · ${state.bhk} BHK · ${MODES.find(m=>m.id===state.mode).name}`;
+  $('yearCost').textContent=fmt(total*12)+' / year';
+  const parts=[rent,bills,c.cash,timeCost]; const sum=Math.max(1,parts.reduce((x,y)=>x+y,0));
+  $('barRent').style.width=parts[0]/sum*100+'%'; $('barBills').style.width=parts[1]/sum*100+'%'; $('barCommute').style.width=parts[2]/sum*100+'%'; $('barTime').style.width=parts[3]/sum*100+'%';
+  $('legRent').textContent=fmt(rent); $('legBills').textContent=fmt(bills); $('legCommute').textContent=fmt(c.cash); $('legTime').textContent=countTime?fmt(timeCost):'Not counted';
+  $('legUtils').textContent=fmt(bills-(+$('maint').value||0));
+  const dep=+$('depositMonths').value; $('legDeposit').textContent=fmt(rent*dep)+` (${dep} mo)`;
+  $('fareBasis').innerHTML=`<b>Commute basis:</b> ${c.basis}<br><span style="color:var(--muted)">Bills basis: Maintenance ${fmt(+$('maint').value||0)} + Water/tanker ${fmt(+$('water').value||0)} + Electricity ${fmt(+$('elec').value||0)} + Gas ${fmt(+$('gas').value||0)} + Internet ${fmt(+$('internet').value||0)} = ${fmt(bills)}/mo.</span>`;
+  $('kDist').textContent=c.distLabel; $('kTimeOne').textContent=c.mins+' min'; $('kHours').textContent=(Math.round(c.hours*10)/10)+' hrs'; $('kPerTrip').textContent=fmt(c.perDay);
+  const ins=$('insight');
+  if(dep>=10){ins.className='insight warn';ins.innerHTML=`<b>Deposit red flag:</b> 10 months is ${fmt(rent*10)} blocked. Bengaluru norm is now 5–6 months — negotiate.`}
+  else if(c.cash>rent*0.35){ins.className='insight warn';ins.innerHTML=`<b>Commute is eating the rent saving.</b> ${fmt(c.cash)}/mo on travel plus ~${Math.round(c.hours)} hrs in peak traffic. A closer flat can win even at higher rent — check the comparison below.`}
+  else if(c.hours>=28){ins.className='insight warn';ins.innerHTML=`<b>Time warning:</b> ~${Math.round(c.hours)} hrs/month is 3+ workdays in commute.`}
+  else{ins.className='insight good';ins.innerHTML=`<b>This route holds up.</b> Commute ${fmt(c.cash)}/mo, ~${Math.round(c.hours)} hrs/month in peak. Still confirm water source and deposit in writing before token money.`}
+  // time-by-mode table
+  $('timeTable').innerHTML=MODES.map(m=>{
+    const cc=commuteFor(m.id,area,office,roundTrips,{metroFrom:$('metroFrom').value,metroTo:$('metroTo').value,metroFare: m.id==='metro'?metroFare:null});
+    return `<tr class="${m.id===state.mode?'sel':''}"><td>${m.name}</td><td>${cc.mins} min</td><td>${Math.round(cc.hours*10)/10}</td><td>${fmt(cc.cash)}</td></tr>`;
+  }).join('');
+  renderCompare(total,office,roundTrips,metroFare);
+  // bus note + amount label
+  const bi=busBasisInfo();
+  $('busAmountLabel').textContent=bi.isPass?'Amount (₹ per month — flat pass)':'Amount (₹ per one-way trip)';
+  $('busNote').innerHTML= bi.isPass?`In use: <b>${bi.label}</b>. Total bus cash = pass + last-mile (if ticked), flat for the month.`:`In use: <b>${bi.label}</b>. At ${roundTrips} office days/mo that is ${fmt((bi.amt)*2*roundTrips)} before last-mile.`;
+  // panels visibility emphasis
+  $('metroPanel').style.opacity=state.mode==='metro'?'1':'.55'; $('busPanel').style.opacity=state.mode==='bus'?'1':'.55';
+  $('lastMile').closest('.check').style.opacity=(state.mode==='metro'||state.mode==='bus')?'1':'.5';
+}
+function renderCompare(currentTotal,office,roundTrips,metroFare){
+  const rows=AREAS.map(a=>{
+    const u=defaultUtils(a,state.bhk); const bills=a.maint+u.water+u.elec+u.gas+u.internet;
+    const cc=commuteFor(state.mode,a,office,roundTrips,{});
+    const countTime=$('countTime').checked; const tc=countTime? cc.hours*(+$('hourly').value||0):0;
+    return {a,bills,rent:a.rents[state.bhk],cc,total:a.rents[state.bhk]+bills+cc.cash+tc};
+  }).sort((x,y)=>x.total-y.total);
+  const top=rows.slice(0,8); const curId=$('area').value;
+  if(!top.find(r=>r.a.id===curId)){top.pop(); top.push(rows.find(r=>r.a.id===curId)); top.sort((x,y)=>x.total-y.total);}
+  $('compare').innerHTML=top.map(r=>{
+    const isCur=r.a.id===curId; const displayTotal=isCur?currentTotal:r.total; const diff=displayTotal-currentTotal;
+    const label=isCur?'<span class="pill">Your pick</span>':(diff<=0?`<span class="save">Saves ${fmt(-diff)}/mo</span>`:`<span class="extra">+${fmt(diff)}/mo</span>`);
+    return `<div class="crow ${isCur?'current':''}"><div><small>Area · ${r.a.rentType}</small><b>${r.a.name}</b> <span style="font-size:12px;color:var(--muted)">${fmt(r.rent)}/mo</span></div><div class="hideM"><small>Rent + bills</small><span class="mono">${fmt(r.rent+r.bills)}</span></div><div><small>Commute · ${r.cc.mins} min peak</small><span class="mono">${fmt(r.cc.cash)}</span></div><div><small>True cost</small><span class="mono" style="font-size:16px">${fmt(displayTotal)}</span></div><div><small>${r.cc.distLabel} · ${Math.round(r.cc.hours)} hrs/mo</small>${label}</div></div>`;
+  }).join('');
+}
+// init
+function init(){
+  $('office').innerHTML=OFFICES.map(o=>`<option value="${o.id}">${o.name}</option>`).join('');
+  renderAreaOptions(); fillStations();
+  $('area').value='hsr'; $('office').value='bellandur';
+  $('modes').innerHTML=MODES.map(m=>`<button type="button" class="mode ${m.id===state.mode?'active':''}" data-mode="${m.id}"><strong>${m.name}</strong><span>${m.desc}</span></button>`).join('');
+  document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x.dataset.mode===state.mode));calc()});
+  document.querySelectorAll('#bhkSeg button').forEach(b=>b.onclick=()=>{state.bhk=+b.dataset.bhk;document.querySelectorAll('#bhkSeg button').forEach(x=>x.classList.toggle('active',+x.dataset.bhk===state.bhk));renderAreaOptions();syncFromArea();calc()});
+  syncFromArea(); calc();
+}
+['rent','maint','water','elec','gas','internet','hourly','busAmount'].forEach(id=>document.addEventListener('input',e=>{if(e.target.id===id)calc()}));
+$('metroFareEdit').addEventListener('input',()=>{state.metroManualFare=true;calc()});
+$('area').addEventListener('change',()=>{syncFromArea();calc()});
+$('office').addEventListener('change',()=>{syncMetroStations();calc()});
+$('metroFrom').addEventListener('change',()=>{state.metroManualFare=false;updateMetroFare()});
+$('metroTo').addEventListener('change',()=>{state.metroManualFare=false;updateMetroFare()});
+$('busBasis').addEventListener('change',()=>{
+  const v=$('busBasis').value;
+  $('busAmount').value= v==='pass-ac'?3200 : v==='pass-ordinary'?1050 : v==='pertrip-ac'?25 : 15;
+  calc();
+});
+['depositMonths','salaryPreset'].forEach(id=>$(id).addEventListener('change',e=>{if(id==='salaryPreset'&&e.target.value)$('hourly').value=Math.round((+e.target.value/160)/10)*10;calc()}));
+$('days').addEventListener('input',calc); $('lastMile').addEventListener('change',calc);
+$('countTime').addEventListener('change',()=>{$('timeRow').style.display=$('countTime').checked?'grid':'none';calc()});
+document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
+  const p=b.dataset.preset;
+  if(p==='hsr-bellandur'){$('area').value='hsr';$('office').value='bellandur';state.mode='metro';$('days').value=3}
+  if(p==='yel-whitefield'){$('area').value='yelahanka';$('office').value='whitefield';state.mode='cab';$('days').value=5}
+  if(p==='whitefield-whitefield'){$('area').value='whitefield';$('office').value='whitefield';state.mode='bike';$('days').value=5}
+  if(p==='ecity-bellandur'){$('area').value='electroniccity';$('office').value='bellandur';state.mode='car';$('days').value=3}
+  document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x.dataset.mode===state.mode));
+  state.bhk=2; document.querySelectorAll('#bhkSeg button').forEach(x=>x.classList.toggle('active',+x.dataset.bhk===2)); renderAreaOptions(); syncFromArea(); calc();
+});
+init();
+</script>
+</body>
+</html>
